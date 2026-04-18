@@ -38,18 +38,21 @@ module.exports = async (req, res) => {
     }
 
     if (action === "toggleDone") {
-      const { pageId, done } = req.body;
-      await notion.pages.update({
-        page_id: pageId,
-        properties: { Done: { checkbox: done } }
-      });
-      return res.status(200).json({ success: true });
-    }
+  const { pageId, done } = req.body;
+  await notion.pages.update({
+    page_id: pageId,
+    properties: { "완료": { checkbox: done } }   // ← 당신 DB의 속성 이름으로
+  });
+  return res.status(200).json({ success: true });
+}
+
+
+
 
     if (action === "getStats") {
       const response = await notion.databases.query({
         database_id: DB_ID,
-        filter: { property: "Done", checkbox: { equals: true } },
+        filter: { property: "완료", checkbox: { equals: true } },
         page_size: 100
       });
       return res.status(200).json(formatQuests(response.results));
