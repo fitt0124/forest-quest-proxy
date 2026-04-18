@@ -65,14 +65,42 @@ module.exports = async (req, res) => {
 function formatQuests(results) {
   return results.map((page) => {
     const p = page.properties;
+
+    // 🔍 Title 속성 자동 감지 (속성 이름이 뭐든 찾아냄)
+    let name = "Untitled";
+    for (const key in p) {
+      if (p[key].type === "title" && p[key].title?.length > 0) {
+        name = p[key].title[0].plain_text;
+        break;
+      }
+    }
+
+    // 🔍 Category 자동 감지 (Category / 카테고리 둘 다 지원)
+    const category =
+      p.Category?.select?.name ||
+      p["카테고리"]?.select?.name ||
+      "정신";
+
+    // 🔍 Done 자동 감지 (Done / 완료 둘 다 지원)
+    const done =
+      p.Done?.checkbox ??
+      p["완료"]?.checkbox ??
+      false;
+
+    // 🔍 Reflection 자동 감지 (Reflection / 오늘 한 행동/회고 둘 다 지원)
+    const reflection =
+      p.Reflection?.rich_text?.[0]?.plain_text ||
+      p["오늘 한 행동/회고"]?.rich_text?.[0]?.plain_text ||
+      "";
+
     return {
       id: page.id,
-      name: p.Name?.title?.[0]?.plain_text || "Untitled",
+      name,
       date: p.Date?.date?.start || null,
-      category: p.Category?.select?.name || "정신",
-      done: p.Done?.checkbox || false,
+      category,
+      done,
       xp: p.XP?.number || null,
-      reflection: p.Reflection?.rich_text?.[0]?.plain_text || ""
+      reflection
     };
   });
 }
