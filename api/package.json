@@ -1,8 +1,0 @@
-{
-  "name": "forest-quest-proxy",
-  "version": "1.0.0",
-  "description": "Forest Quest Notion API Proxy",
-  "dependencies": {
-    "@notionhq/client": "^2.2.15"
-  }
-}
