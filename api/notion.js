@@ -47,8 +47,6 @@ module.exports = async (req, res) => {
 }
 
 
-
-
     if (action === "getStats") {
       const response = await notion.databases.query({
         database_id: DB_ID,
@@ -58,6 +56,22 @@ module.exports = async (req, res) => {
       return res.status(200).json(formatQuests(response.results));
     }
 
+    if (action === "getAllInRange") {
+      const days = parseInt(req.query.days || "30", 10);
+      const start = new Date();
+      start.setDate(start.getDate() - days);
+      const startStr = start.toISOString().split("T")[0];
+
+      const response = await notion.databases.query({
+        database_id: DB_ID,
+        filter: { property: "Date", date: { on_or_after: startStr } },
+        sorts: [{ property: "Date", direction: "descending" }],
+        page_size: 100
+      });
+      return res.status(200).json(formatQuests(response.results));
+    }
+
+    
     return res.status(400).json({ error: "Unknown action" });
   } catch (err) {
     console.error(err);
